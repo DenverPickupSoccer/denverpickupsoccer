@@ -1,5 +1,5 @@
-import firebase from 'firebase/app'
-import 'firebase/auth'
+import { initializeApp } from 'firebase/app'
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: "AIzaSyA4IVtwgW2Q2BhOhNw5QJ7MhBMnr_E5wEA",
@@ -11,18 +11,23 @@ const firebaseConfig = {
   measurementId: "G-1BED8SWYQ2"
 };
 
-firebase.initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
+const auth = getAuth()
 
 const signInUser = (email, password) => {
-  return firebase.auth().signInWithEmailAndPassword(email, password)
+  return signInWithEmailAndPassword(auth, email, password)
 }
 
 const createNewUser = (email, password) => {
-  return firebase.auth().createUserWithEmailAndPassword(email, password)
+  return createUserWithEmailAndPassword(auth, email, password)
 }
 
 const getCurrentUser = async (callback) => {
-  await firebase.auth().onAuthStateChanged(callback);
+  await onAuthStateChanged(auth, callback);
 }
 
-export { signInUser, createNewUser, getCurrentUser }
+const signOutUser = () => {
+  return signOut(auth)
+}
+
+export { signInUser, createNewUser, getCurrentUser, signOutUser }

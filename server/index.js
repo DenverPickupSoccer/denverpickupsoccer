@@ -13,6 +13,9 @@ const cors = require('cors')
 const app = express();
 const port = process.env.PORT
 
+// Routes imports
+const organizerRouter = require('./routes/organizers')
+
 // list of endpoints allowed to make requests to this backend via CORS
 const whitelist = ['http://localhost:3001', 'https://denverpickupsoccer.web.app']
 const corsOptions = {
@@ -33,6 +36,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.set('port', port)
+
+app.use('/api/organizers', organizerRouter)
 
 router.get('/api', (request, response) => {
   response.send({ message: "This is the beginning" })

@@ -7,6 +7,7 @@ import { createNewUser, getCurrentUser, signInUser } from 'services/firebase';
 // TODO: when signing up,
 //  - ask for password twice and confirm password matches
 //  - ask for name and other profile stuff
+//  - send authentication email
 const LoginOrSignUp = ({ destination }) => {
   const [serverError, setServerError] = useState(null)
   const [email, setEmail] = useState('')
@@ -20,7 +21,7 @@ const LoginOrSignUp = ({ destination }) => {
     getCurrentUser((user) => {
       if (user) setSuccessfulAuth(true)
     })
-  })
+  }, [])
 
   const validateEmail = email => {
     setEmail(email)

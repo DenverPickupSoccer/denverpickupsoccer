@@ -1,3 +1,4 @@
+import React from "react";
 import Navbar from './components/navbar/Navbar';
 import HeadingBanner from './components/HeadingBanner';
 import PickupCard from './components/PickupCard';
@@ -464,7 +465,7 @@ const App = () => {
 
   return (
       <div className="has-text-centered landing">
-        <Navbar/>
+        <Navbar showCallToAction={true} />
         <hr className='horizontal-line'/>
         <section className="centered">
           <Search searchTerm={searchTerm}
