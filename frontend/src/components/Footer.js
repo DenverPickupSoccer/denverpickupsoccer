@@ -1,3 +1,4 @@
+import React from "react";
 import FacebookLogo from '../fb_icon.svg';
 
 const Footer = () => {

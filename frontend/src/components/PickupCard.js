@@ -1,3 +1,4 @@
+import React from "react";
 const PickupCard = ({ field, day, time, address, contact }) => {
   const addressToString = () => {
     return Object.values(address).join(', ')
