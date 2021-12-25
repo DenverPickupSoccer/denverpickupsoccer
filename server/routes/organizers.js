@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router()
+const firebase = require('../services/firebase')
+const db = firebase.firestore()
 
 router.get('/:organizerId/pickups', (req, res) => {
  // TODO: connect to firebase DB to get pickups
@@ -33,8 +35,24 @@ router.get('/:organizerId/pickups', (req, res) => {
 })
 
 router.post('/:organizerId/create_pickup', (req, res) => {
- // TODO: connect to firebase DB to save pickup for organizer
- res.send(req.body)
+ const organizerId = req.params.organizerId
+ const pickup = {...req.body, organizerId}
+ db.collection('organizer_pickups').add(pickup)
+     .then(() => res.sendStatus(200))
+     .catch(() => res.sendStatus(500))
+})
+
+router.post('/:organizerId/announce_pickup', async (req, res) => {
+ const organizerId = req.params.organizerId
+ const pickup = {...req.body, organizerId}
+
+ const pickupRef = db.collection('organizer_pickups').doc()
+ const announcementRef = db.collection('organizer_pickup_announcements').doc()
+ const announcement = { pickupId: pickupRef.id, organizerId }
+
+ Promise.all([pickupRef.set(pickup), announcementRef.set(announcement)])
+     .then(() => res.sendStatus(200))
+     .catch((e) => res.sendStatus(500))
 })
 
 module.exports = router

@@ -464,7 +464,7 @@ const App = () => {
 
   return (
       <div className="has-text-centered landing">
-        <Navbar/>
+        <Navbar showCallToAction={true} />
         <hr className='horizontal-line'/>
         <section className="centered">
           <Search searchTerm={searchTerm}

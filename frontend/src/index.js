@@ -8,12 +8,18 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Auth from './components/Auth';
 import { UserProvider } from 'contexts/UserProvider';
 import Dashboard from 'components/dashboard/Dashboard';
+import AnnouncePickup from 'components/dashboard/AnnouncePickup';
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <Switch>
         <Route path="/authenticate" component={Auth} />
+        <Route path="/dashboard/announce">
+          <UserProvider>
+            <AnnouncePickup />
+          </UserProvider>
+        </Route>
         <Route path="/dashboard">
           <UserProvider>
             <Dashboard />

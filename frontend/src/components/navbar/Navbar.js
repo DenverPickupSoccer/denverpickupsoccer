@@ -3,8 +3,8 @@ import Logo from '../../logo.png';
 import './navbar.css'
 import LinkToAuth from 'helpers/link_to_auth';
 
-const Navbar = ({ showCallToAction }) => {
-  if (showCallToAction === undefined || showCallToAction === null) showCallToAction = true
+const Navbar = ({ showCallToAction, children }) => {
+  if (showCallToAction === undefined || showCallToAction === null) showCallToAction = false
   return <nav className="navbar" role="navigation" aria-label="main navigation">
     <div className="navbar-brand">
       <a className="navbar-item" href="/#">
@@ -13,15 +13,16 @@ const Navbar = ({ showCallToAction }) => {
              height="30" />
       </a>
     </div>
+    <div className="navbar-actions">
     {showCallToAction && (
-      <div className="navbar-actions">
         <LinkToAuth
-            linkText='Post your pickup'
-            destination='/dashboard'
+            linkText='Announce a pickup'
+            destination='/dashboard/announce'
             className='button is-primary mr-2 mt-2'
         />
-      </div>
     )}
+      { children }
+    </div>
   </nav>
 }
 

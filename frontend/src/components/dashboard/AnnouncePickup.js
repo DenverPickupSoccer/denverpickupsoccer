@@ -1,16 +1,21 @@
-import React, { useState } from 'react';
-import HeadingBanner from 'components/HeadingBanner';
-import { createPickup } from 'services/organizers';
-import Alert from 'components/notification/Alert';
+import React, {useState} from 'react';
+import {announcePickup} from 'services/organizers';
 import HorizontalForm from 'components/form/HorizontalForm';
 import TextField from 'components/form/TextField';
+import HelperText from 'components/form/HelperText';
 import DropdownField from 'components/form/DropdownField';
 import ButtonField from 'components/form/ButtonField';
-import Modal from 'components/modal/Modal';
-import HelperText from 'components/form/HelperText';
+import Alert from 'components/notification/Alert';
+import HeadingBanner from 'components/HeadingBanner';
+import Navbar from 'components/navbar/Navbar';
+import {useUserProvider} from 'contexts/UserProvider';
+import {Link, Redirect} from 'react-router-dom';
 import {COLORADO_CITIES, DAYS_OF_WEEK} from 'GlobalConstants';
 
-const AddPickupModal = ({ setShowAddPickupModal, organizerId }) => {
+const AnnouncePickup = ({ organizerId }) => {
+  const {user, loading: loadingUser} = useUserProvider();
+  const [savingPickup, setSavingPickup] = useState(false)
+
   const [fieldName, setFieldName] = useState('')
   const [streetAddress, setStreetAddress] = useState('')
   const [city, setCity] = useState(COLORADO_CITIES[0])
@@ -106,7 +111,7 @@ const AddPickupModal = ({ setShowAddPickupModal, organizerId }) => {
       isStreetAddressValid && streetAddress.trim() !== '' &&
       isZipValid && zip.trim() !== '' &&
       isHourValid && hour !== 0 &&
-      isMinuteValid
+      isMinuteValid && minute !== 0
 
   const reset = () => {
     setFieldName('')
@@ -119,7 +124,7 @@ const AddPickupModal = ({ setShowAddPickupModal, organizerId }) => {
     setDay(DAYS_OF_WEEK[0])
   }
 
-  const addPickup = () => {
+  const savePickup = () => {
     const pickup = {
       field: fieldName,
       address: {
@@ -135,13 +140,15 @@ const AddPickupModal = ({ setShowAddPickupModal, organizerId }) => {
       },
       day,
     }
+    setSavingPickup(true)
 
-    createPickup(pickup, organizerId)
-        .then(() => {
-          reset()
-          setSubmitSuccess(true)
-        })
-        .catch(setSubmitError)
+    announcePickup(pickup, organizerId || user.uid)
+    .then(() => {
+      reset()
+      setSubmitSuccess(true)
+    })
+    .catch(setSubmitError)
+    .finally(() => setSavingPickup(false))
   }
 
   const renderForm = () => {
@@ -161,7 +168,7 @@ const AddPickupModal = ({ setShowAddPickupModal, organizerId }) => {
             </TextField>
           </HorizontalForm>
 
-          <HorizontalForm label="Address">
+          <HorizontalForm label="Field Address">
             <TextField
                 value={streetAddress}
                 placeholder="Street address"
@@ -183,6 +190,7 @@ const AddPickupModal = ({ setShowAddPickupModal, organizerId }) => {
             />
             <TextField
                 value={zip}
+                placeholder="Zip"
                 onChangeFn={handleZipInput}
                 isInputValid={isZipValid}
             >
@@ -240,7 +248,12 @@ const AddPickupModal = ({ setShowAddPickupModal, organizerId }) => {
           </HorizontalForm>
 
           <HorizontalForm>
-            <ButtonField text="Add pickup" onClickFn={addPickup} disabled={!isAllInputValid()} />
+            <ButtonField
+                text="Announce pickup"
+                onClickFn={savePickup}
+                disabled={!isAllInputValid()}
+                loading={savingPickup}
+            />
           </HorizontalForm>
 
         </>
@@ -267,20 +280,29 @@ const AddPickupModal = ({ setShowAddPickupModal, organizerId }) => {
     )
   }
 
-  return (
-      <Modal closeModalFn={() => setShowAddPickupModal(false)}>
-        <div className="card">
-          <HeadingBanner text="Add new pickup" />
-          <div className="card-content">
-            <div className="content">
-              {renderSubmitError()}
-              {renderSubmitSuccess()}
-              {renderForm()}
-            </div>
-          </div>
-        </div>
-      </Modal>
-  )
-}
+  if (!loadingUser && !user) return <Redirect to='/'/>
+  if (loadingUser) return <p>loading ...</p>
 
-export default AddPickupModal;
+  return (
+    <div className="has-text-centered landing">
+      <Navbar>
+        <Link
+            to={{ pathname: "/dashboard" }}
+            className='button is-primary mr-2 mt-2'
+        >
+          My Dashboard
+        </Link>
+      </Navbar>
+      <HeadingBanner text="Announce new pickup" />
+      <div className="card-content">
+        <div className="content">
+          {renderSubmitError()}
+          {renderSubmitSuccess()}
+          {renderForm()}
+        </div>
+      </div>
+    </div>
+  )
+};
+
+export default AnnouncePickup;
